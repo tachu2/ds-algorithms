@@ -1,21 +1,15 @@
-from typing import TypeVar, Generic
-
-K = TypeVar("K")
-V = TypeVar("V")
-
-
 class HashTable:
-    class Entry(Generic[K, V]):
+    class Entry:
         def __init__(self, key, value, hash):
-            self.key: K = key
-            self.value: V = value
+            self.key = key
+            self.value = value
             self.hash: int = hash
 
         def __str__(self):
             return f"Node(key={self.key}, value={self.value}, hash={self.hash})"
 
-    NULL = Entry(None, None, 0)  # 空いているスロット
-    TOMBSTONE = Entry(None, None, 0)  # 削除されたスロット。ここには挿入しない
+    NULL = Entry(None, None, -1)  # 空いているスロット
+    TOMBSTONE = Entry(None, None, -2)  # 削除されたスロット。ここには挿入しない
     TABLE_MAX_LOAD = 0.75  # 最大保有率。これを超えたらリサイズする
 
     def __init__(self):
@@ -78,16 +72,37 @@ class HashTable:
             if v != HashTable.NULL and v != HashTable.TOMBSTONE:
                 self.add(v.key, v.value)
 
+    def __contains__(self, key):
+        return self.find(key) is not None
+
     def __str__(self):
-        return str(self.arr)
+        return str([str(entry) for entry in self.arr])
 
 
 def main():
     ht = HashTable()
     for i in range(10):
-        ht.add(i, i * 10)
+        ht.add(f"key{i}", f"value{i}")
 
     print(ht)
+    for i in range(20):
+        if f"key{i}" in ht:
+            entry = ht.find(f"key{i}")
+            print(f"Found: {entry}")
+        else:
+            print(f"Not Found: key{i}")
+
+    for i in range(10):
+        ht.add(f"key{i}", f"value{i * 2}")
+
+    for i in range(20):
+        if f"key{i}" in ht:
+            entry = ht.find(f"key{i}")
+            print(f"Found: {entry}")
+        else:
+            print(f"Not Found: key{i}")
+
+    ht.add(2, "value")
 
 
 if __name__ == "__main__":
