@@ -76,9 +76,10 @@ class HashTable:
         self.capacity = old_capacity * 2
         self.arr = [self.NULL] * (self.capacity)
         self.size = 0
-        for v in old_arr:
-            if v != HashTable.NULL and v != HashTable.TOMBSTONE:
-                self.insert(v.key, v.value)
+        for entry in old_arr:
+            if entry is HashTable.NULL or entry is HashTable.TOMBSTONE:
+                continue
+            self.insert(entry.key, entry.value)
 
     def __setitem__(self, key, value):
         self.insert(key, value)
