@@ -26,9 +26,6 @@ class HashTable:
         self.capacity: int = 8
         self.arr: list[self.Entry] = [self.NULL] * self.capacity
 
-    def _index(self, key_hash: int) -> int:
-        return key_hash & (self.capacity - 1)
-
     def insert(self, key, value):
         if (self.size + 1) / self.capacity >= self.TABLE_MAX_LOAD:
             self._resize()
@@ -176,7 +173,7 @@ class ChainedHashTable:
             return False
         index = entry.hash % self.capacity
         if prev is None:
-            self.arr[index] = None
+            self.arr[index] = entry.next
         else:
             prev.next = entry.next
 

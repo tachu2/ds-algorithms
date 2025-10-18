@@ -1,6 +1,6 @@
 import time
 import random
-from hash_table import HashTable
+from hash_table import HashTable, ChainedHashTable
 
 
 def benchmark_insert(table, keys, values):
@@ -44,4 +44,5 @@ if __name__ == "__main__":
     N = 100000
 
     run_benchmark(HashTable, N)
+    run_benchmark(ChainedHashTable, N)
     run_benchmark(dict, N)
