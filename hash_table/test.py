@@ -1,10 +1,10 @@
 import unittest
-from hash_table import HashTable, ChainedHashTable
+from hash_table import OpenAddrHashTable, ChainedHashTable
 
 
 class TestHashTable(unittest.TestCase):
     def setUp(self):
-        self.ht = HashTable()
+        self.ht = OpenAddrHashTable()
 
     def test_insert_and_get(self):
         self.ht.insert("key1", "value1")

@@ -1,7 +1,7 @@
 from typing import Optional, Tuple
 
 
-class HashTable:
+class OpenAddrHashTable:
     """
     HashTable implementation using open addressing with linear probing.
     """
