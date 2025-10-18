@@ -16,20 +16,20 @@ class HashTable:
     def __init__(self):
         self.size: int = 0
         self.capacity: int = 8
-        self.arr: list[HashTable.Entry] = [self.NULL] * self.capacity
+        self.arr: list[self.Entry] = [self.NULL] * self.capacity
 
     def _index(self, key_hash: int) -> int:
         return key_hash & (self.capacity - 1)
 
     def insert(self, key, value):
-        if (self.size + 1) / self.capacity >= HashTable.TABLE_MAX_LOAD:
+        if (self.size + 1) / self.capacity >= self.TABLE_MAX_LOAD:
             self._resize()
         key_hash = hash(key)
         index = key_hash % self.capacity
 
         while True:
             entry = self.arr[index]
-            if entry is HashTable.NULL:
+            if entry is self.NULL:
                 break
             if key_hash == entry.hash and key == entry.key:
                 # 既に存在する場合は上書き
@@ -38,7 +38,7 @@ class HashTable:
             # tombstoneもしくはcollasion場合は次のインデックスへ
             index = (index + 1) % self.capacity
 
-        self.arr[index] = HashTable.Entry(key, value, key_hash)
+        self.arr[index] = self.Entry(key, value, key_hash)
         self.size += 1
 
     def _find(self, key) -> Entry | None:
@@ -47,7 +47,7 @@ class HashTable:
 
         while True:
             entry = self.arr[index]
-            if entry is HashTable.NULL:
+            if entry is self.NULL:
                 return None
             if key_hash == entry.hash and key == entry.key:
                 return entry
@@ -63,10 +63,10 @@ class HashTable:
 
         while True:
             entry = self.arr[index]
-            if entry is HashTable.NULL:
+            if entry is self.NULL:
                 return False
             if key_hash == entry.hash and key == entry.key:
-                self.arr[index] = HashTable.TOMBSTONE
+                self.arr[index] = self.TOMBSTONE
                 return True
             index = (index + 1) % self.capacity
 
@@ -77,7 +77,7 @@ class HashTable:
         self.arr = [self.NULL] * (self.capacity)
         self.size = 0
         for entry in old_arr:
-            if entry is HashTable.NULL or entry is HashTable.TOMBSTONE:
+            if entry is self.NULL or entry is self.TOMBSTONE:
                 continue
             self.insert(entry.key, entry.value)
 
