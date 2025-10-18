@@ -1,9 +1,14 @@
+from typing import Optional, Tuple
+
+
 class HashTable:
     """
     HashTable implementation using open addressing with linear probing.
     """
+
     class Entry:
         __slots__ = ("key", "value", "hash")
+
         def __init__(self, key, value, hash):
             self.key = key
             self.value = value
@@ -100,8 +105,121 @@ class HashTable:
         return str([str(entry) for entry in self.arr])
 
 
+class ChainedHashTable:
+    """
+    HashTable implementation using separate chaining.
+    """
+
+    class Entry:
+        __slots__ = ("key", "value", "hash", "next")
+
+        def __init__(self, key, value, hash, next):
+            self.key = key
+            self.value = value
+            self.hash: int = hash
+            self.next: self.Entry | None = next
+
+        def __str__(self):
+            return f"Node(key={self.key}, value={self.value}, hash={self.hash})"
+
+    TABLE_MAX_LOAD = 2.0  # 最大保有率。これを超えたらリサイズする
+
+    def __init__(self):
+        self.size: int = 0
+        self.capacity: int = 8
+        self.arr: list[self.Entry | None] = [None] * self.capacity
+
+    def insert(self, key, value):
+        if (self.size + 1) / self.capacity >= self.TABLE_MAX_LOAD:
+            self._resize()
+        key_hash = hash(key)
+        index = key_hash % self.capacity
+
+        entry = self.arr[index]
+        if entry is None:
+            self.arr[index] = self.Entry(key, value, key_hash, None)
+            self.size += 1
+            return
+
+        while entry is not None:
+            if key_hash == entry.hash and key == entry.key:
+                entry.value = value
+                return
+            last_entry = entry
+            entry = entry.next
+        last_entry.next = self.Entry(key, value, key_hash, None)
+        self.size += 1
+
+    def _find(self, key) -> Optional[Tuple[Entry, Entry]]:
+        """
+        returns (previous_target, target) or None
+        """
+        key_hash = hash(key)
+        index = key_hash % self.capacity
+
+        prev = None
+        entry = self.arr[index]
+        while entry is not None:
+            if key_hash == entry.hash and key == entry.key:
+                return prev, entry
+            prev = entry
+            entry = entry.next
+        return None, None
+
+    def get(self, key):
+        _, entry = self._find(key)
+        return entry.value if entry else None
+
+    def remove(self, key) -> bool:
+        prev, entry = self._find(key)
+        if entry is None:
+            return False
+        index = entry.hash % self.capacity
+        if prev is None:
+            self.arr[index] = None
+        else:
+            prev.next = entry.next
+
+        self.size -= 1
+        del entry
+        return True
+
+    def _resize(self):
+        old_arr = self.arr
+        old_capacity = self.capacity
+        self.capacity = old_capacity * 2
+        self.arr = [None] * (self.capacity)
+        self.size = 0
+        for slot in old_arr:
+            entry = slot
+            while entry is not None:
+                self.insert(entry.key, entry.value)
+                entry = entry.next
+
+    def __setitem__(self, key, value):
+        self.insert(key, value)
+
+    def __getitem__(self, key):
+        return self.get(key)
+
+    def __delitem__(self, key):
+        return self.remove(key)
+
+    def __contains__(self, key):
+        return self.get(key) is not None
+
+    def __str__(self):
+        entries: list[self.Entry] = []
+        for head in self.arr:
+            entry = head
+            while entry is not None:
+                entries.append(str(entry))
+                entry = entry.next
+        return str(entries)
+
+
 def main():
-    ht = HashTable()
+    ht = ChainedHashTable()
     for i in range(10):
         ht.insert(f"key{i}", f"value{i}")
 
@@ -117,7 +235,7 @@ def main():
 
     for i in range(20):
         if f"key{i}" in ht:
-            entry = ht._find(f"key{i}")
+            entry = ht.get(f"key{i}")
             print(f"Found: {entry}")
         else:
             print(f"Not Found: key{i}")
@@ -127,7 +245,7 @@ def main():
 
     for i in range(20):
         if f"key{i}" in ht:
-            entry = ht._find(f"key{i}")
+            entry = ht.get(f"key{i}")
             print(f"Found: {entry}")
         else:
             print(f"Not Found: key{i}")
@@ -137,7 +255,7 @@ def main():
 
     for i in range(20):
         if f"key{i}" in ht:
-            entry = ht._find(f"key{i}")
+            entry = ht.get(f"key{i}")
             print(f"Found: {entry}")
         else:
             print(f"Not Found: key{i}")
