@@ -17,7 +17,7 @@ class HashTable:
         self.capacity: int = 8
         self.arr: list[HashTable.Entry] = [self.NULL] * self.capacity
 
-    def add(self, key, value):
+    def insert(self, key, value):
         if (self.size + 1) / self.capacity >= HashTable.TABLE_MAX_LOAD:
             self._resize()
         key_hash = hash(key)
@@ -37,7 +37,7 @@ class HashTable:
         self.arr[index] = HashTable.Entry(key, value, key_hash)
         self.size += 1
 
-    def find(self, key) -> Entry | None:
+    def _find(self, key) -> Entry | None:
         key_hash = hash(key)
         index = key_hash % self.capacity
 
@@ -49,7 +49,11 @@ class HashTable:
                 return entry
             index = (index + 1) % self.capacity
 
-    def delete(self, key) -> bool:
+    def get(self, key):
+        entry = self._find(key)
+        return entry.value if entry else None
+
+    def remove(self, key) -> bool:
         key_hash = hash(key)
         index = key_hash % self.capacity
 
@@ -70,10 +74,19 @@ class HashTable:
         self.size = 0
         for v in old_arr:
             if v != HashTable.NULL and v != HashTable.TOMBSTONE:
-                self.add(v.key, v.value)
+                self.insert(v.key, v.value)
+
+    def __setitem__(self, key, value):
+        self.insert(key, value)
+
+    def __getitem__(self, key):
+        return self.get(key)
+
+    def __delitem__(self, key):
+        return self.remove(key)
 
     def __contains__(self, key):
-        return self.find(key) is not None
+        return self._find(key) is not None
 
     def __str__(self):
         return str([str(entry) for entry in self.arr])
@@ -82,27 +95,45 @@ class HashTable:
 def main():
     ht = HashTable()
     for i in range(10):
-        ht.add(f"key{i}", f"value{i}")
+        ht.insert(f"key{i}", f"value{i}")
 
     print(ht)
     for i in range(20):
         if f"key{i}" in ht:
-            entry = ht.find(f"key{i}")
-            print(f"Found: {entry}")
+            print(f"Found: {ht[f'key{i}']}")
         else:
             print(f"Not Found: key{i}")
 
     for i in range(10):
-        ht.add(f"key{i}", f"value{i * 2}")
+        ht.insert(f"key{i}", f"value{i * 2}")
 
     for i in range(20):
         if f"key{i}" in ht:
-            entry = ht.find(f"key{i}")
+            entry = ht._find(f"key{i}")
             print(f"Found: {entry}")
         else:
             print(f"Not Found: key{i}")
 
-    ht.add(2, "value")
+    for i in range(5):
+        del ht[f"key{i}"]
+
+    for i in range(20):
+        if f"key{i}" in ht:
+            entry = ht._find(f"key{i}")
+            print(f"Found: {entry}")
+        else:
+            print(f"Not Found: key{i}")
+
+    for i in range(1, 10):
+        ht.insert(f"key{i * 2}", f"value{i * 3}")
+
+    for i in range(20):
+        if f"key{i}" in ht:
+            entry = ht._find(f"key{i}")
+            print(f"Found: {entry}")
+        else:
+            print(f"Not Found: key{i}")
+    print(ht)
 
 
 if __name__ == "__main__":
