@@ -37,12 +37,25 @@ def run_benchmark(table_class, n):
     print(f"Lookup: {t_lookup:.6f} sec")
 
     t_delete = benchmark_delete(table, keys)
-    print(f"Delete: {t_delete:.6f} sec\n")
+    print(f"Delete: {t_delete:.6f} sec")
 
 
 if __name__ == "__main__":
-    N = 100000
+    bignum = 100_000
+    middlenum = 10_000
+    smallnum = 1_000
 
-    run_benchmark(OpenAddrHashTable, N)
-    run_benchmark(ChainedHashTable, N)
-    run_benchmark(dict, N)
+    print("-" * 100)
+    run_benchmark(OpenAddrHashTable, bignum)
+    run_benchmark(ChainedHashTable, bignum)
+    run_benchmark(dict, bignum)
+
+    print("-" * 100)
+    run_benchmark(OpenAddrHashTable, middlenum)
+    run_benchmark(ChainedHashTable, middlenum)
+    run_benchmark(dict, middlenum)
+
+    print("-" * 100)
+    run_benchmark(OpenAddrHashTable, smallnum)
+    run_benchmark(ChainedHashTable, smallnum)
+    run_benchmark(dict, smallnum)
