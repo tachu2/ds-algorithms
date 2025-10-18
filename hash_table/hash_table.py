@@ -1,4 +1,7 @@
 class HashTable:
+    """
+    HashTable implementation using open addressing with linear probing.
+    """
     class Entry:
         __slots__ = ("key", "value", "hash")
         def __init__(self, key, value, hash):
