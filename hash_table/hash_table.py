@@ -1,5 +1,6 @@
 class HashTable:
     class Entry:
+        __slots__ = ("key", "value", "hash")
         def __init__(self, key, value, hash):
             self.key = key
             self.value = value
@@ -17,6 +18,9 @@ class HashTable:
         self.capacity: int = 8
         self.arr: list[HashTable.Entry] = [self.NULL] * self.capacity
 
+    def _index(self, key_hash: int) -> int:
+        return key_hash & (self.capacity - 1)
+
     def insert(self, key, value):
         if (self.size + 1) / self.capacity >= HashTable.TABLE_MAX_LOAD:
             self._resize()
@@ -25,7 +29,7 @@ class HashTable:
 
         while True:
             entry = self.arr[index]
-            if entry == HashTable.NULL:
+            if entry is HashTable.NULL:
                 break
             if key_hash == entry.hash and key == entry.key:
                 # 既に存在する場合は上書き
@@ -43,7 +47,7 @@ class HashTable:
 
         while True:
             entry = self.arr[index]
-            if entry == HashTable.NULL:
+            if entry is HashTable.NULL:
                 return None
             if key_hash == entry.hash and key == entry.key:
                 return entry
@@ -59,7 +63,7 @@ class HashTable:
 
         while True:
             entry = self.arr[index]
-            if entry == HashTable.NULL:
+            if entry is HashTable.NULL:
                 return False
             if key_hash == entry.hash and key == entry.key:
                 self.arr[index] = HashTable.TOMBSTONE
