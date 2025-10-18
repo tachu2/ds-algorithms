@@ -43,23 +43,5 @@ def run_benchmark(table_class, n):
 if __name__ == "__main__":
     N = 100000
 
-    # 自作HashTable
-    class CustomHashTableWrapper(dict):
-        def __init__(self):
-            self.ht = HashTable()
-
-        def __setitem__(self, k, v):
-            self.ht.insert(k, v)
-
-        def __getitem__(self, k):
-            return self.ht.get(k)
-
-        def __delitem__(self, k):
-            self.ht.remove(k)
-
-        @property
-        def __name__(self):
-            return "HashTable"
-
-    run_benchmark(CustomHashTableWrapper, N)
+    run_benchmark(HashTable, N)
     run_benchmark(dict, N)
